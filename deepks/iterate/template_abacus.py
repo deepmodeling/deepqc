@@ -432,35 +432,35 @@ def gather_stats_abacus(systems_train, systems_test,
                 ic=conv_file.read().split()
                 if "achieved" in ic and "not" not in ic:
                     c_list[(int)(ic[0])]=True
-            des = np.load(f"{sys_train_paths[i]}/ABACUS/{f}/dm_eig.npy")
+            des = np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_dm_eig.npy")
             d_list.append(des)
-            ene = np.load(f"{sys_train_paths[i]}/ABACUS/{f}/e_base.npy")
+            ene = np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_ebase.npy")
             e0_list.append(ene/2)    #Ry to Hartree
-            ene = np.load(f"{sys_train_paths[i]}/ABACUS/{f}/e_tot.npy")
+            ene = np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_etot.npy")
             e_list.append(ene/2)
             if(cal_force):
-                fcs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/f_base.npy")
+                fcs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_fbase.npy")
                 f0_list.append(fcs/2)    #Ry to Hartree
-                fcs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/f_tot.npy")
+                fcs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_ftot.npy")
                 f_list.append(fcs/2)
-                if os.path.exists(f"{sys_train_paths[i]}/ABACUS/{f}/grad_vx.npy"):
-                    gvx=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/grad_vx.npy")
+                if os.path.exists(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gradvx.npy"):
+                    gvx=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gradvx.npy")
                     gvx_list.append(gvx)
             if(cal_stress):
-                scs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/s_base.npy")
+                scs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_sbase.npy")
                 s0_list.append(scs/2)    #Ry to Hartree
-                scs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/s_tot.npy")
+                scs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_stot.npy")
                 s_list.append(scs/2)
-                if os.path.exists(f"{sys_train_paths[i]}/ABACUS/{f}/grad_vepsl.npy"):
-                    gvepsl=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/grad_vepsl.npy")
+                if os.path.exists(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gvepsl.npy"):
+                    gvepsl=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gvepsl.npy")
                     gvepsl_list.append(gvepsl)
             if(deepks_bandgap):
-                ocs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/o_base.npy")
+                ocs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_obase.npy")
                 o0_list.append(ocs/2)      
-                ocs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/o_tot.npy")
+                ocs=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_otot.npy")
                 o_list.append(ocs/2)
-                if os.path.exists(f"{sys_train_paths[i]}/ABACUS/{f}/orbital_precalc.npy"):
-                    orbital_precalc=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/orbital_precalc.npy")
+                if os.path.exists(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_orbpre.npy"):
+                    orbital_precalc=np.load(f"{sys_train_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_orbpre.npy")
                     op_list.append(orbital_precalc)             
         np.save(f"{train_dump}/{sys_train_names[i]}/conv.npy", c_list)
         dm_eig=np.array(d_list)   #concatenate
@@ -529,35 +529,35 @@ def gather_stats_abacus(systems_train, systems_test,
                 ic=conv_file.read().split()
                 if "achieved" in ic and "not" not in ic:
                     c_list[(int)(ic[0])]=True
-            des = np.load(f"{sys_test_paths[i]}/ABACUS/{f}/dm_eig.npy")
+            des = np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_dm_eig.npy")
             d_list.append(des)
-            ene = np.load(f"{sys_test_paths[i]}/ABACUS/{f}/e_base.npy")
+            ene = np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_ebase.npy")
             e0_list.append(ene/2)    #Ry to Hartree
-            ene = np.load(f"{sys_test_paths[i]}/ABACUS/{f}/e_tot.npy")
+            ene = np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_etot.npy")
             e_list.append(ene/2)
             if(cal_force):
-                fcs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/f_base.npy")
+                fcs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_fbase.npy")
                 f0_list.append(fcs/2)    #Ry to Hartree
-                fcs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/f_tot.npy")
+                fcs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_ftot.npy")
                 f_list.append(fcs/2)
-                if os.path.exists(f"{sys_test_paths[i]}/ABACUS/{f}/grad_vx.npy"):
-                    gvx=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/grad_vx.npy")
+                if os.path.exists(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gradvx.npy"):
+                    gvx=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gradvx.npy")
                     gvx_list.append(gvx)
             if(cal_stress):
-                scs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/s_base.npy")
+                scs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_sbase.npy")
                 s0_list.append(scs/2)    #Ry to Hartree
-                scs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/s_tot.npy")
+                scs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_stot.npy")
                 s_list.append(scs/2)
-                if os.path.exists(f"{sys_test_paths[i]}/ABACUS/{f}/grad_vepsl.npy"):
-                    gvepsl=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/grad_vepsl.npy")
+                if os.path.exists(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gvepsl.npy"):
+                    gvepsl=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_gvepsl.npy")
                     gvepsl_list.append(gvepsl)
             if(deepks_bandgap):
-                ocs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/o_base.npy")
+                ocs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_obase.npy")
                 o0_list.append(ocs/2)      
-                ocs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/o_tot.npy")
+                ocs=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_otot.npy")
                 o_list.append(ocs/2)
-                if os.path.exists(f"{sys_test_paths[i]}/ABACUS/{f}/orbital_precalc.npy"):
-                    orbital_precalc=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/orbital_precalc.npy")
+                if os.path.exists(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_orbpre.npy"):
+                    orbital_precalc=np.load(f"{sys_test_paths[i]}/ABACUS/{f}/OUT.ABACUS/deepks_orbpre.npy")
                     op_list.append(orbital_precalc)
         dm_eig=np.array(d_list)   #concatenate
         np.save(f"{test_dump}/{sys_test_names[i]}/dm_eig.npy", dm_eig)
