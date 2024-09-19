@@ -95,50 +95,94 @@ def make_abacus_scf_input(fp_params):
     return ret
 
 def make_abacus_scf_stru(sys_data, fp_pp_files, fp_params):
-    atom_names = sys_data['atom_names']
-    atom_numbs = sys_data['atom_numbs']
-    assert(len(atom_names) == len(fp_pp_files)), "the number of pp_files must be equal to the number of atom types. "
-    assert(len(atom_names) == len(atom_numbs)), "Please check the name of atoms. "
-    cell = sys_data["cells"][0].reshape([3, 3])
-    if "lattice_vector" in fp_params:
-        cell = fp_params["lattice_vector"]
-    coord = sys_data['coords'][0]
-    #volume = np.linalg.det(cell)
-    #lattice_const = np.power(volume, 1/3)
+    atom_names = sys_data['atom_names']  # Get the list of atom names, e.g., ['Cs', 'Pb', 'I']
+    atom_numbs = sys_data['atom_numbs']  # Get the number of each atom type, e.g., [4, 4, 12]
+    
+    # Create a dictionary to store the pseudopotential and orbital files for each atom in the system
+    valid_pp_files = {}
+    valid_orb_files = {}
+    
+    # Iterate over the provided pp_files, validate and select the pseudopotential files that match atoms in the current system
+    for pp_file in fp_pp_files:
+        # Manually get the file name, assuming the path is separated by '/'
+        filename = pp_file.split('/')[-1]  # Extracts the file name from '../../../Pb_ONCV_PBE-1.0.upf' -> 'Pb_ONCV_PBE-1.0.upf'
+        element_name = filename.split('_')[0]  # Extract the element name, e.g., 'Pb_ONCV_PBE-1.0.upf' -> 'Pb'
+        
+        # If the element exists in the current system's atom_names, check if a pseudopotential file has already been assigned
+        if element_name in atom_names:
+            # If a pseudopotential file for this element already exists, raise an error
+            assert element_name not in valid_pp_files, f"Pseudopotential file for element {element_name} already exists, cannot assign multiple files for the same element."
+            # Otherwise, add the pseudopotential file to the valid_pp_files dictionary
+            valid_pp_files[element_name] = pp_file
+
+    # Ensure that all elements have corresponding pseudopotential files
+    for atom in atom_names:
+        assert atom in valid_pp_files, f"No pseudopotential file found for element {atom}, please check the provided pp_files."
+    
+    # Continue building the STRU file
     ret = "ATOMIC_SPECIES\n"
     for iatom in range(len(atom_names)):
-        ret += atom_names[iatom] + " 1.00 " + fp_pp_files[iatom] + "\n"
-    ret += "\n"
+        atom = atom_names[iatom]
+        # Now select the correct pseudopotential file from valid_pp_files
+        ret += f"{atom} 1.00 {valid_pp_files[atom]}\n"  # Write atom name, mass (1.00), and corresponding pseudopotential file
+    
+    # Continue generating other parts, such as LATTICE_CONSTANT, LATTICE_VECTORS, etc.
     if "lattice_constant" in fp_params:
         ret += "\nLATTICE_CONSTANT\n"
-        ret += str(fp_params["lattice_constant"]) + "\n\n" # in Bohr, in this way coord and cell are in Angstrom 
+        ret += f"{fp_params['lattice_constant']}\n\n"  # in Bohr
     else:
         ret += "\nLATTICE_CONSTANT\n"
-        ret += str(1/bohr2ang) + "\n\n"
+        ret += f"{1 / bohr2ang}\n\n"  # Default value is 1/bohr2ang
+    
     ret += "LATTICE_VECTORS\n"
+    cell = sys_data["cells"][0].reshape([3, 3])
     for ix in range(3):
         for iy in range(3):
-            ret += str(cell[ix][iy]) + " "
+            ret += f"{cell[ix][iy]} "
         ret += "\n"
-    ret += "\n"
-    ret += "ATOMIC_POSITIONS\n"
-    ret += fp_params["coord_type"]
-    ret += "\n\n"
+    
+    # Continue processing atomic coordinates
+    ret += "\nATOMIC_POSITIONS\n"
+    ret += f"{fp_params['coord_type']}\n\n"
+    
     natom_tot = 0
+    coord = sys_data['coords'][0]
     for iele in range(len(atom_names)):
-        ret += atom_names[iele] + "\n"
-        ret += "0.0\n"
-        ret += str(atom_numbs[iele]) + "\n"
+        ret += f"{atom_names[iele]}\n"
+        ret += "0.0\n"  # Reference energy
+        ret += f"{atom_numbs[iele]}\n"
         for iatom in range(atom_numbs[iele]):
-            ret += "%.12f %.12f %.12f %d %d %d\n" % (coord[natom_tot, 0], coord[natom_tot, 1], coord[natom_tot, 2], 0, 0, 0)
+            ret += f"{coord[natom_tot, 0]:.12f} {coord[natom_tot, 1]:.12f} {coord[natom_tot, 2]:.12f} 0 0 0\n"
             natom_tot += 1
-    assert(natom_tot == sum(atom_numbs))
-    if "basis_type" in fp_params and fp_params["basis_type"]=="lcao":
-        ret +="\nNUMERICAL_ORBITAL\n"
-        assert(len(fp_params["orb_files"])==len(atom_names))
-        for iatom in range(len(atom_names)):
-            ret += fp_params["orb_files"][iatom] +"\n"
-    if "deepks_scf" in fp_params and fp_params["deepks_out_labels"]==1:
-        ret +="\nNUMERICAL_DESCRIPTOR\n"
-        ret +=fp_params["proj_file"][0]+"\n"
+    assert natom_tot == sum(atom_numbs), "The total number of atoms does not match."
+    
+    # If the basis type is localized orbitals (lcao)
+    if "basis_type" in fp_params and fp_params["basis_type"] == "lcao":
+        ret += "\nNUMERICAL_ORBITAL\n"
+        # Iterate over the provided orb_files, validate and select the orbital files that match atoms in the current system
+        for orb_file in fp_params["orb_files"]:
+            # Manually get the file name, assuming the path is separated by '/'
+            filename = orb_file.split('/')[-1]  # Extracts the file name
+            element_name = filename.split('_')[0]  # Extract the element name, e.g., 'Pb_gga_7au_100Ry_2s2p1d.orb' -> 'Pb'
+            
+            # If the element exists in the current system's atom_names, check if an orbital file has already been assigned
+            if element_name in atom_names:
+                # If an orbital file for this element already exists, raise an error
+                assert element_name not in valid_orb_files, f"Orbital file for element {element_name} already exists, cannot assign multiple files for the same element."
+                # Otherwise, add the orbital file to the valid_orb_files dictionary
+                valid_orb_files[element_name] = orb_file
+        
+        # Ensure that all elements have corresponding orbital files
+        for atom in atom_names:
+            assert atom in valid_orb_files, f"No orbital file found for element {atom}, please check the provided orb_files."
+        
+        # Write the valid orbital files into ret
+        for atom in atom_names:
+            ret += f"{valid_orb_files[atom]}\n"
+
+    # If DeepKS calculation is enabled
+    if "deepks_scf" in fp_params and fp_params["deepks_out_labels"] == 1:
+        ret += "\nNUMERICAL_DESCRIPTOR\n"
+        ret += f"{fp_params['proj_file'][0]}\n"
+    
     return ret
