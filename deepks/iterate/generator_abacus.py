@@ -19,8 +19,8 @@ def make_abacus_scf_input(fp_params):
     # Make INPUT file for abacus pw scf calculation.
     ret = "INPUT_PARAMETERS\n"
     ret += "calculation scf\n"
-    assert(fp_params['ntype'] >= 0 and type(fp_params["ntype"]) == int),  "'ntype' should be a positive integer."
-    ret += "ntype %d\n" % fp_params['ntype']
+    # assert(fp_params['ntype'] >= 0 and type(fp_params["ntype"]) == int),  "'ntype' should be a positive integer."
+    # ret += "ntype %d\n" % fp_params['ntype']
     #ret += "pseudo_dir ./\n"
     if "ecutwfc" in fp_params:
         assert(fp_params["ecutwfc"] >= 0) ,  "'ntype' should be non-negative."
