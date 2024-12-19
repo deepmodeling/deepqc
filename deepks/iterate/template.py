@@ -449,6 +449,7 @@ def make_train(source_train="data_train", source_test="data_test", *,
     )
     # concat
     seq = [run_train, post_train]
+    # seq = [run_train]
     if cleanup:
         clean_train = make_cleanup(
             ["slurm-*.out", "err", "fin.record", "tag_*finished"],
